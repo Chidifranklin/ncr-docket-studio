@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "tier": { "type": "string", "enum": ["FREE", "PRO", "ENTERPRISE"] },
+        "credits": { "type": "number" },
+        "createdAt": { "type": "timestamp" },
+        "updatedAt": { "type": "timestamp" }
+      }
+    },
+    "DocketTemplate": {
+      "collection": "users/{userId}/templates",
+      "fields": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "templateName": { "type": "string" },
+        "paperSize": { "type": "string" },
+        "customWidthMm": { "type": "number" },
+        "customHeightMm": { "type": "number" },
+        "hasBleed": { "type": "boolean" },
+        "hasCropMarks": { "type": "boolean" },
+        "hasRegistrationMarks": { "type": "boolean" },
+        "hasBindingGuides": { "type": "boolean" },
+        "bindingEdge": { "type": "string" },
+        "securityPattern": { "type": "string" },
+        "patternOpacity": { "type": "number" },
+        "primaryColor": { "type": "string" },
+        "accentColor": { "type": "string" },
+        "businessName": { "type": "string" },
+        "rcNumber": { "type": "string" },
+        "tagline": { "type": "string" },
+        "headOfficeAddress": { "type": "string" },
+        "branchOfficeAddress": { "type": "string" },
+        "phoneNumbers": { "type": "array" },
+        "logoUrl": { "type": "string" },
+        "columns": { "type": "array" },
+        "rowCount": { "type": "number" },
+        "footerDisclaimer": { "type": "string" },
+        "ncrParts": { "type": "number" },
+        "ncrLabels": { "type": "array" },
+        "isSerialized": { "type": "boolean" },
+        "startSerial": { "type": "number" },
+        "endSerial": { "type": "number" },
+        "serialPrefix": { "type": "string" },
+        "serialDigits": { "type": "number" }
+      }
+    },
+    "ExportJob": {
+      "collection": "users/{userId}/exports",
+      "fields": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "templateId": { "type": "string" },
+        "templateName": { "type": "string" },
+        "isSerialized": { "type": "boolean" },
+        "totalPageCount": { "type": "number" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      }
+    }
+  }
+}

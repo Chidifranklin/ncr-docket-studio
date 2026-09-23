@@ -1,0 +1,6 @@
+{
+  "name": "DocketForge — Docket & NCR Book Designer",
+  "description": "Desktop-publishing and print-ready stationery designer for creating branded blank docket books, receipt stationery, and serialized carbonless copy (NCR) books with vector security patterns and crop marks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
