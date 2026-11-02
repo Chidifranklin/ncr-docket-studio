@@ -2,6 +2,7 @@ import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import type { DocketTemplateData } from '../types/docket';
 import { getPrintGeometry, mmToPt } from './printDimensions';
 import { getPatternLinesForPdf } from './guilloche';
+import { getFontPdfMapping } from './fonts';
 
 // Helper to convert hex #RRGGBB to pdf-lib rgb(0..1)
 function hexToPdfRgb(hex: string, defaultColor = { r: 0, g: 0, b: 0 }) {
@@ -51,9 +52,31 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
   const { template, onProgress, overrideSinglePage } = options;
   const pdfDoc = await PDFDocument.create();
 
-  // Standard Fonts (High precision vector glyphs)
-  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  // Standard Fonts (Vector glyphs with typography mapping)
+  const headerFontType = getFontPdfMapping(template.headerFont);
+  const bodyFontType = getFontPdfMapping(template.bodyFont);
+
+  const headerFontBold = await pdfDoc.embedFont(
+    headerFontType === 'TimesRoman'
+      ? StandardFonts.TimesRomanBold
+      : headerFontType === 'Courier'
+      ? StandardFonts.CourierBold
+      : StandardFonts.HelveticaBold
+  );
+  const fontRegular = await pdfDoc.embedFont(
+    bodyFontType === 'TimesRoman'
+      ? StandardFonts.TimesRoman
+      : bodyFontType === 'Courier'
+      ? StandardFonts.Courier
+      : StandardFonts.Helvetica
+  );
+  const fontBold = await pdfDoc.embedFont(
+    bodyFontType === 'TimesRoman'
+      ? StandardFonts.TimesRomanBold
+      : bodyFontType === 'Courier'
+      ? StandardFonts.CourierBold
+      : StandardFonts.HelveticaBold
+  );
   const fontMono = await pdfDoc.embedFont(StandardFonts.CourierBold);
   const fontMonoRegular = await pdfDoc.embedFont(StandardFonts.Courier);
 
@@ -406,14 +429,14 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
       x: textStartX,
       y: currentY - 2,
       size: titleFontSize,
-      font: fontBold,
+      font: headerFontBold,
       color: primaryRgb,
     });
 
     // RC Number (if present)
     if (template.rcNumber) {
       const rcText = `(RC: ${template.rcNumber})`;
-      const bizNameW = fontBold.widthOfTextAtSize(bizName, titleFontSize);
+      const bizNameW = headerFontBold.widthOfTextAtSize(bizName, titleFontSize);
       if (bizNameW + fontRegular.widthOfTextAtSize(rcText, 8) + 10 < availableTitleWidth) {
         page.drawText(rcText, {
           x: textStartX + bizNameW + 8,
@@ -522,7 +545,7 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
     // Document Title Badge (e.g. SALES INVOICE)
     if (template.documentTitle) {
       const titleText = template.documentTitle.toUpperCase();
-      const badgeW = fontBold.widthOfTextAtSize(titleText, 8.5) + 20;
+      const badgeW = headerFontBold.widthOfTextAtSize(titleText, 8.5) + 20;
       const badgeH = 13;
       const badgeX = effectiveContentLeft + (contentWidth - badgeW) / 2;
 
@@ -537,7 +560,7 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
         x: badgeX + 10,
         y: currentY - 6,
         size: 8.5,
-        font: fontBold,
+        font: headerFontBold,
         color: rgb(1, 1, 1),
       });
       currentY -= 14;
@@ -662,11 +685,14 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
 
     // 8. The Docket Table
     // Calculate row height and table height
+    const customRowH = template.fieldDimensions?.tableRowHeight
+      ? template.fieldDimensions.tableRowHeight * 0.75
+      : undefined;
     const footerRequiredHeight = (template.includeAmountInWords ? 24 : 12) + (template.includeCustomerSignature || template.includeAuthorizedSignature ? 40 : 16) + 20;
     const tableAvailableHeight = currentY - (effectiveContentBottom + footerRequiredHeight);
     const rowCount = Math.max(6, Math.min(24, template.rowCount || 12));
     const headerRowHeight = 16;
-    const dataRowHeight = Math.max(12, Math.min(22, (tableAvailableHeight - headerRowHeight) / rowCount));
+    const dataRowHeight = customRowH || Math.max(12, Math.min(22, (tableAvailableHeight - headerRowHeight) / rowCount));
     const tableTotalHeight = headerRowHeight + rowCount * dataRowHeight;
 
     const tableTop = currentY;
@@ -841,38 +867,43 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
 
     if (template.includeTotalBox) {
       const lastCol = colCoords[colCoords.length - 1];
-      const totalBoxWidth = (lastCol?.width || 70) + (colCoords[colCoords.length - 2]?.width || 60);
+      const customTotalW = template.fieldDimensions?.totalBoxWidth ? (template.fieldDimensions.totalBoxWidth * 0.72) : undefined;
+      const customTotalH = template.fieldDimensions?.totalBoxHeight ? (template.fieldDimensions.totalBoxHeight * 0.72) : 14;
+      const defaultTotalW = (lastCol?.width || 70) + (colCoords[colCoords.length - 2]?.width || 60);
+      const totalBoxWidth = customTotalW || defaultTotalW;
+      const totalBoxHeight = customTotalH;
       const totalBoxX = effectiveContentRight - totalBoxWidth;
 
       // Total Row Box (Red if accentColor set)
       page.drawRectangle({
         x: totalBoxX,
-        y: currentY - 14,
+        y: currentY - totalBoxHeight,
         width: totalBoxWidth,
-        height: 14,
+        height: totalBoxHeight,
         borderColor: accentRgb,
         borderWidth: 0.8,
       });
 
+      const labelW = Math.min(50, totalBoxWidth * 0.45);
       page.drawRectangle({
         x: totalBoxX,
-        y: currentY - 14,
-        width: 50,
-        height: 14,
+        y: currentY - totalBoxHeight,
+        width: labelW,
+        height: totalBoxHeight,
         color: accentRgb,
       });
 
       page.drawText('TOTAL N', {
         x: totalBoxX + 6,
-        y: currentY - 10,
+        y: currentY - totalBoxHeight + (totalBoxHeight - 8) / 2 + 1,
         size: 7.5,
         font: fontBold,
         color: rgb(1, 1, 1),
       });
 
       page.drawLine({
-        start: { x: totalBoxX + 50, y: currentY },
-        end: { x: totalBoxX + 50, y: currentY - 14 },
+        start: { x: totalBoxX + labelW, y: currentY },
+        end: { x: totalBoxX + labelW, y: currentY - totalBoxHeight },
         thickness: 0.5,
         color: accentRgb,
       });
@@ -900,9 +931,16 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
 
     // 10. Signatures & Disclaimers
     currentY -= 4;
+    const customSigHeight = template.fieldDimensions?.signatureBlockHeight
+      ? template.fieldDimensions.signatureBlockHeight * 0.72
+      : 18;
+    const customSigWidth = template.fieldDimensions?.signatureBlockWidth
+      ? template.fieldDimensions.signatureBlockWidth * 0.72
+      : undefined;
+
     if (template.includeThreeSignatures) {
-      const sigLineY = currentY - 14;
-      const sigColW = (contentWidth - 40) / 3;
+      const sigLineY = currentY - customSigHeight;
+      const sigColW = customSigWidth || ((contentWidth - 40) / 3);
 
       // 1. Cashier
       page.drawLine({
@@ -953,17 +991,18 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
 
       currentY = sigLineY - 14;
     } else if (template.includeCustomerSignature || template.includeAuthorizedSignature) {
-      const sigLineY = currentY - 18;
+      const sigLineY = currentY - customSigHeight;
+      const sigColW = customSigWidth || 120;
 
       if (template.includeCustomerSignature) {
         page.drawLine({
           start: { x: effectiveContentLeft, y: sigLineY },
-          end: { x: effectiveContentLeft + 120, y: sigLineY },
+          end: { x: effectiveContentLeft + sigColW, y: sigLineY },
           thickness: 0.5,
           color: textDark,
         });
         page.drawText("Customer's Signature", {
-          x: effectiveContentLeft + 12,
+          x: effectiveContentLeft + 8,
           y: sigLineY - 9,
           size: 7,
           font: fontRegular,
@@ -973,13 +1012,13 @@ export async function generateDocketPdf(options: PdfExportOptions): Promise<{ bl
 
       if (template.includeAuthorizedSignature) {
         page.drawLine({
-          start: { x: effectiveContentRight - 125, y: sigLineY },
+          start: { x: effectiveContentRight - sigColW, y: sigLineY },
           end: { x: effectiveContentRight, y: sigLineY },
           thickness: 0.5,
           color: textDark,
         });
         page.drawText('Manager / Authorized Sign.', {
-          x: effectiveContentRight - 120,
+          x: effectiveContentRight - sigColW + 6,
           y: sigLineY - 9,
           size: 7,
           font: fontBold,

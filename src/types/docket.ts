@@ -15,6 +15,32 @@ export type SecurityPatternType =
   | 'security_rings'
   | 'none';
 
+export interface FormFieldDimensions {
+  // Customer & Meta fields
+  customerNameWidthPercent?: number; // percentage of row width (e.g. 40-90%)
+  customerNameHeight?: number; // px (e.g. 12-32px)
+  dateFieldWidth?: number; // px (e.g. 70-180px)
+  dateFieldHeight?: number; // px (e.g. 14-32px)
+  addressFieldHeight?: number; // px (e.g. 12-36px)
+  phoneFieldWidth?: number; // px (e.g. 60-150px)
+
+  // Table
+  tableRowHeight?: number; // px (e.g. 16-40px, default 20px)
+
+  // Totals & Words
+  totalBoxWidth?: number; // px (e.g. 100-240px, default 140px)
+  totalBoxHeight?: number; // px (e.g. 18-45px, default 24px)
+  amountInWordsHeight?: number; // px (e.g. 12-36px, default 16px)
+
+  // Signatures
+  signatureBlockWidth?: number; // px (e.g. 80-200px, default 120px)
+  signatureBlockHeight?: number; // px (e.g. 20-65px, default 32px)
+
+  // Header / Branding
+  logoWidth?: number; // px (e.g. 32-96px, default 48px)
+  logoHeight?: number; // px (e.g. 32-96px, default 48px)
+}
+
 export interface DocketTemplateData {
   id?: string;
   templateName: string;
@@ -30,6 +56,10 @@ export interface DocketTemplateData {
   primaryColor: string;
   accentColor: string;
 
+  // Typography
+  headerFont?: string; // e.g. 'Cinzel', 'Playfair Display', 'Montserrat', 'Oswald', 'Bebas Neue'
+  bodyFont?: string; // e.g. 'Plus Jakarta Sans', 'Inter', 'Roboto', 'Open Sans', 'Space Mono'
+
   // Layout & Table
   columns: ColumnSchema[];
   rowCount: number;
@@ -43,6 +73,9 @@ export interface DocketTemplateData {
   includeCustomerSignature: boolean;
   includeTotalBox: boolean;
   includeSubtotalAndBalance: boolean;
+
+  // Custom Form Field Dimensions (Interactive resizing)
+  fieldDimensions?: FormFieldDimensions;
 
   // Security Micro-Pattern
   securityPattern: SecurityPatternType;

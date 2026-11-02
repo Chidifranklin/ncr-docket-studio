@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { useDocketStore } from '../../store/useDocketStore';
+import { TypographySelector } from './TypographySelector';
 
 const POPULAR_PRIMARY_COLORS = [
   { name: 'Royal Indigo', hex: '#1A0B66' },
@@ -362,7 +363,10 @@ export const BrandingPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. Commercial Stationery Features (Watermarks & Ribbon) */}
+      {/* 5. Google Fonts & Typography Selector */}
+      <TypographySelector />
+
+      {/* 6. Commercial Stationery Features (Watermarks & Ribbon) */}
       <div className="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-3.5">
         <label className="flex items-center gap-2 text-xs font-semibold text-slate-300">
           <Sparkles className="w-3.5 h-3.5 text-indigo-400" />

@@ -11,6 +11,8 @@ export const DEFAULT_PRESET_MIKKY: DocketTemplateData = {
   logoDataUri: '',
   primaryColor: '#1A0B66',
   accentColor: '#D81B60',
+  headerFont: 'Cinzel',
+  bodyFont: 'Plus Jakarta Sans',
 
   columns: [
     { id: 'c1', label: 'QTY', widthPercent: 14, align: 'center' },
@@ -65,6 +67,8 @@ export const PRESET_APEX_WAYBILL: DocketTemplateData = {
   logoDataUri: '',
   primaryColor: '#0F172A',
   accentColor: '#D97706',
+  headerFont: 'Montserrat',
+  bodyFont: 'Inter',
 
   columns: [
     { id: 'c1', label: 'S/N', widthPercent: 10, align: 'center' },
@@ -120,6 +124,8 @@ export const PRESET_BOUTIQUE_RECEIPT: DocketTemplateData = {
   logoDataUri: '',
   primaryColor: '#4A044E',
   accentColor: '#9333EA',
+  headerFont: 'Playfair Display',
+  bodyFont: 'Open Sans',
 
   columns: [
     { id: 'c1', label: 'ITEM', widthPercent: 54, align: 'left' },
@@ -194,6 +200,8 @@ export const PRESET_GODWIN_INVOICE: DocketTemplateData = {
   logoDataUri: GODWIN_LOGO_DATA_URI,
   primaryColor: '#0B5ED7',
   accentColor: '#D32F2F',
+  headerFont: 'Oswald',
+  bodyFont: 'Roboto',
 
   documentTitle: 'SALES INVOICE',
   titleBadgeColor: '#D32F2F',

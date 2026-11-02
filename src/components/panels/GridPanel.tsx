@@ -372,6 +372,139 @@ export const GridPanel: React.FC = () => {
           />
         </div>
       </div>
+
+      {/* 5. Field Sizing & Spacing Dimensions */}
+      <div className="bg-slate-900/90 rounded-xl p-4 border border-slate-800 space-y-3.5">
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-300">
+            <Sliders className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Interactive Form Resizing</span>
+          </label>
+          {docket.fieldDimensions && (
+            <button
+              onClick={() => updateDocket({ fieldDimensions: {} })}
+              className="text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 transition-colors"
+              title="Reset all fields to standard defaults"
+            >
+              Reset All
+            </button>
+          )}
+        </div>
+
+        <p className="text-[11px] text-slate-400 leading-relaxed">
+          Tip: You can click and drag handles directly on the <strong className="text-indigo-300">Canvas</strong> preview, or adjust precise values below.
+        </p>
+
+        <div className="space-y-3 pt-1">
+          {/* Table Row Height */}
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-slate-400">Table Row Height (Handwriting Space):</span>
+              <span className="font-mono text-slate-200">
+                {docket.fieldDimensions?.tableRowHeight || 20} px
+              </span>
+            </div>
+            <input
+              type="range"
+              min="16"
+              max="40"
+              step="1"
+              value={docket.fieldDimensions?.tableRowHeight || 20}
+              onChange={(e) =>
+                updateDocket({
+                  fieldDimensions: {
+                    ...docket.fieldDimensions,
+                    tableRowHeight: Number(e.target.value),
+                  },
+                })
+              }
+              className="w-full accent-indigo-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+            />
+          </div>
+
+          {/* Customer Name Width */}
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="text-slate-400">Customer Name Line Width:</span>
+              <span className="font-mono text-slate-200">
+                {docket.fieldDimensions?.customerNameWidthPercent || 65}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min="40"
+              max="85"
+              step="1"
+              value={docket.fieldDimensions?.customerNameWidthPercent || 65}
+              onChange={(e) =>
+                updateDocket({
+                  fieldDimensions: {
+                    ...docket.fieldDimensions,
+                    customerNameWidthPercent: Number(e.target.value),
+                  },
+                })
+              }
+              className="w-full accent-indigo-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+            />
+          </div>
+
+          {/* Total Box Width */}
+          {docket.includeTotalBox && (
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Total ₦ Box Width:</span>
+                <span className="font-mono text-slate-200">
+                  {docket.fieldDimensions?.totalBoxWidth || 135} px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="95"
+                max="220"
+                step="5"
+                value={docket.fieldDimensions?.totalBoxWidth || 135}
+                onChange={(e) =>
+                  updateDocket({
+                    fieldDimensions: {
+                      ...docket.fieldDimensions,
+                      totalBoxWidth: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-indigo-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+              />
+            </div>
+          )}
+
+          {/* Signature Block Height */}
+          {(docket.includeCustomerSignature || docket.includeAuthorizedSignature || docket.includeThreeSignatures) && (
+            <div>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-400">Signature Stamp Clearance:</span>
+                <span className="font-mono text-slate-200">
+                  {docket.fieldDimensions?.signatureBlockHeight || 30} px
+                </span>
+              </div>
+              <input
+                type="range"
+                min="20"
+                max="60"
+                step="2"
+                value={docket.fieldDimensions?.signatureBlockHeight || 30}
+                onChange={(e) =>
+                  updateDocket({
+                    fieldDimensions: {
+                      ...docket.fieldDimensions,
+                      signatureBlockHeight: Number(e.target.value),
+                    },
+                  })
+                }
+                className="w-full accent-indigo-500 h-2 bg-slate-950 rounded-lg cursor-pointer"
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
